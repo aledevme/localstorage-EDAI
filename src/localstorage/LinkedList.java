@@ -1,6 +1,5 @@
 package localstorage;
-
-public class LinkedList <T> {
+public class LinkedList <T>{
     private Node<T> head;
     private int size;
 
@@ -19,7 +18,7 @@ public class LinkedList <T> {
         size++;
     }
 
-    public void add(int index, T value){
+    public void set(int index, T value){
         Node<T> newNode = new Node<>(value);
         if(index == 0){
             newNode.setNext(head);
@@ -34,4 +33,32 @@ public class LinkedList <T> {
         }
         size++;
     }
+
+    public void remove(int index){
+        if(index == 0) {
+            head = head.getNext();
+        }
+        else{
+            Node<T> current = head;
+            for (int i=0; i < index - 1; i++){
+                current = current.getNext();
+            }
+            current.setNext(current.getNext().getNext());
+        }
+        size--;
+    }
+
+    public Node get(int index){
+        Node<T> current = head;
+        for(int i=0; i< index; i++){
+            current = current.getNext();
+        }
+        return current;
+    }
+
+    public int size() {
+        return size;
+    }
+
+
 }
