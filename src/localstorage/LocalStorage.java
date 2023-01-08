@@ -1,59 +1,78 @@
 package localstorage;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.LinkedList;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LocalStorage<T> {
+    private static File file;
+    private static Map<String, Object> map;
 
-    private static final LinkedList<Object> storage = new LinkedList<>();
-    private static final String FILE_NAME = "storage.txt";
-
-    public static <T> void setItem(String key, T value) throws IOException {
-        int index = getIndex(key);
-        if (index == -1) {
-            storage.add(new Item<T>(key, value));
-        } else {
-            storage.set(index, new Item<T>(key, value));
-        }
-        writeToFile(key, value);
+    static {
+        file = new File("local_storage.txt");
+        map = new HashMap<>();
+        loadFromFile();
     }
 
-    public static <T> T getItem(String key) {
-        int index = getIndex(key);
-        if (index == -1) {
-            return null;
-        }
-        return ((Item<T>) storage.get(index)).getValue();
-    }
-
-    public static void removeItem(String key) throws IOException {
-        int index = getIndex(key);
-        if (index != -1) {
-            storage.remove(index);
-        }
-        writeToFile(key, null);
-    }
-
-    private static int getIndex(String key) {
-        for (int i = 0; i < storage.size(); i++) {
-            Item item = (Item) storage.get(i);
-            if (item.getKey().equals(key)) {
-                return i;
+    private static void loadFromFile() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] keyValue = line.split("=");
+                if (keyValue.length != 2) {
+                    continue;
+                }
+                String key = keyValue[0];
+                Object value = keyValue[1];
+                if (value.toString().startsWith("[") && value.toString().endsWith("]")) {
+                    String arrayString = value.toString().substring(1, value.toString().length() - 1);
+                    String[] array = arrayString.split(", ");
+                    LinkedList<String> list = new LinkedList<>();
+                    for (int i = 0; i < array.length; i++) {
+                        list.add(array[i]);
+                    }
+                    map.put(key, list);
+                } else if (value.toString().matches("^[-+]?\\d*\\.?\\d+$")) {
+                    if (value.toString().contains(".")) {
+                        float floatValue = Float.parseFloat(value.toString());
+                        map.put(key, floatValue);
+                    } else {
+                        int intValue = Integer.parseInt(value.toString());
+                        map.put(key, intValue);
+                    }
+                } else {
+                    map.put(key, value);
+                }
             }
-        }
-        return -1;
-    }
-
-    private static boolean keyExists(String key) {
-        return getIndex(key) != -1;
-    }
-
-    private static void writeToFile(String key, Object value) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            bw.write(key + ": " + (value != null ? value.toString() : "null"));
-            bw.newLine();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+    public static Object getItem(String key) {
+        return map.get(key);
+    }
+
+    public static void setItem(String key, Object value) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+        if (value.getClass().isArray()) {
+            bw.append(key + "=" + "[");
+            Object[] array = (Object[]) value;
+            for (int i = 0; i < array.length; i++) {
+                bw.append(array[i].toString());
+                if (i < array.length - 1) {
+                    bw.append(", ");
+                }
+            }
+            bw.append("]");
+        } else {
+            bw.append(key + "=" + value.toString());
+        }
+        bw.newLine();
+        bw.close();
+    }
+
+
 }
 
