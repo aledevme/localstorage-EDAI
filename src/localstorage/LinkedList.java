@@ -1,7 +1,6 @@
 package localstorage;
-import java.util.Arrays;
 
-public class LinkedList<E> {
+public class LinkedList<E, S> {
 
     private static class Node<E> {
         E data;

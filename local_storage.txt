@@ -1,4 +1,2 @@
-valores=[1, 4]
-valores2=[2, 5]
-valores2=[2, 5]
-hola=adios
+books=[{"author":"michael","title":"peter pan"}, {"author":"Andipin","title":"peter pan 2"}]
+

@@ -25,9 +25,11 @@ public class LocalStorage<T> {
                 String key = keyValue[0];
                 Object value = keyValue[1];
                 if (value.toString().startsWith("[") && value.toString().endsWith("]")) {
+
                     String arrayString = value.toString().substring(1, value.toString().length() - 1);
                     String[] array = arrayString.split(", ");
-                    LinkedList<String> list = new LinkedList<>();
+
+                    LinkedList<String, String> list = new LinkedList<>();
                     for (int i = 0; i < array.length; i++) {
                         list.add(array[i]);
                     }
@@ -48,6 +50,7 @@ public class LocalStorage<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public static Object getItem(String key) {
