@@ -1,2 +1,1 @@
-books=[{"author":"michael","title":"peter pan"}, {"author":"Andipin","title":"peter pan 2"}]
-
+books=[]

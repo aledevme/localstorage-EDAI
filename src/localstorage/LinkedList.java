@@ -38,6 +38,18 @@ public class LinkedList<E, S> {
         }
         return false;
     }
+    public int indexOf(E element) {
+        Node<E> current = head;
+        int index = 0;
+        while (current != null) {
+            if (current.data.equals(element)) {
+                return index;
+            }
+            current = current.next;
+            index++;
+        }
+        return -1;
+    }
 
     public void add(E element) {
         Node<E> newNode = new Node<>(element, null);
@@ -80,6 +92,22 @@ public class LinkedList<E, S> {
             current = current.next;
         }
         return current.data;
+    }
+
+    public void remove(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (index == 0) {
+            head = head.next;
+        } else {
+            Node<E> current = head;
+            for (int i = 0; i < index - 1; i++) {
+                current = current.next;
+            }
+            current.next = current.next.next;
+        }
+        size--;
     }
 
     public E[] toArray() {

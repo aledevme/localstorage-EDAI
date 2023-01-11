@@ -2,6 +2,7 @@ package localstorage;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class LocalStorage<T> {
     private static File file;
@@ -30,10 +31,15 @@ public class LocalStorage<T> {
                     String[] array = arrayString.split(", ");
 
                     LinkedList<String, String> list = new LinkedList<>();
-                    for (int i = 0; i < array.length; i++) {
-                        list.add(array[i]);
+                    if(list.isEmpty()){
+                        map.put(key, 0);
+                    }else{
+                        for (int i = 0; i < array.length; i++) {
+                            list.add(array[i]);
+                        }
+                        map.put(key, list);
                     }
-                    map.put(key, list);
+
                 } else if (value.toString().matches("^[-+]?\\d*\\.?\\d+$")) {
                     if (value.toString().contains(".")) {
                         float floatValue = Float.parseFloat(value.toString());
@@ -54,28 +60,69 @@ public class LocalStorage<T> {
     }
 
     public static Object getItem(String key) {
+        if(!map.containsKey(key)) loadFromFile();
         return map.get(key);
     }
-
     public static void setItem(String key, Object value) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
-        if (value.getClass().isArray()) {
-            bw.append(key + "=" + "[");
-            Object[] array = (Object[]) value;
-            for (int i = 0; i < array.length; i++) {
-                bw.append(array[i].toString());
-                if (i < array.length - 1) {
-                    bw.append(", ");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+            if (value.getClass().isArray()) {
+                bw.append(key + "=" + "[");
+                Object[] array = (Object[]) value;
+                for (int i = 0; i < array.length; i++) {
+                    bw.append(array[i].toString());
+                    if (i < array.length - 1) {
+                        bw.append(", ");
+                    }
                 }
+                bw.append("]");
+            } else {
+                bw.append(key + "=" + value.toString());
             }
-            bw.append("]");
-        } else {
-            bw.append(key + "=" + value.toString());
+            bw.newLine();
+            bw.close();
+    }
+    public static void removeKey(String key) throws IOException {
+        if (keyExist(key)) {
+            map.remove(key);
+            writeToFile();
         }
-        bw.newLine();
+    }
+
+    public static String[] getAllKeys() {
+        String[] keys = new String[map.size()];
+        int i = 0;
+        for (String key : map.keySet()) {
+            keys[i] = key;
+            i++;
+        }
+        return keys;
+    }
+
+    private static void writeToFile() throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (value.getClass().isArray()) {
+                bw.append(key + "=" + "[");
+                Object[] array = (Object[]) value;
+                for (int i = 0; i < array.length; i++) {
+                    bw.append(array[i].toString());
+                    if (i < array.length - 1) {
+                        bw.append(", ");
+                    }
+                }
+                bw.append("]");
+            } else {
+                bw.append(key + "=" + value.toString());
+            }
+            bw.newLine();
+        }
         bw.close();
     }
 
-
+    public static boolean keyExist(String key) {
+        return map.containsKey(key);
+    }
 }
 
