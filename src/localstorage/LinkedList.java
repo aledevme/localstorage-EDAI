@@ -85,7 +85,7 @@ public class LinkedList<E, S> {
 
     public E get(int index) {
         if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException();
+            return null;
         }
         Node<E> current = head;
         for (int i = 0; i < index; i++) {

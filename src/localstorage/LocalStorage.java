@@ -24,28 +24,24 @@ public class LocalStorage<T> {
                     continue;
                 }
                 String key = keyValue[0];
-                Object value = keyValue[1];
-                if (value.toString().startsWith("[") && value.toString().endsWith("]")) {
-
-                    String arrayString = value.toString().substring(1, value.toString().length() - 1);
+                String value = keyValue[1];
+                if (value.equals("[]")) {
+                    map.put(key, new LinkedList<>());
+                } else if (value.startsWith("[") && value.endsWith("]")) {
+                    String arrayString = value.substring(1, value.length() - 1);
                     String[] array = arrayString.split(", ");
 
                     LinkedList<String, String> list = new LinkedList<>();
-                    if(list.isEmpty()){
-                        map.put(key, 0);
-                    }else{
-                        for (int i = 0; i < array.length; i++) {
-                            list.add(array[i]);
-                        }
-                        map.put(key, list);
+                    for (int i = 0; i < array.length; i++) {
+                        list.add(array[i]);
                     }
-
-                } else if (value.toString().matches("^[-+]?\\d*\\.?\\d+$")) {
-                    if (value.toString().contains(".")) {
-                        float floatValue = Float.parseFloat(value.toString());
+                    map.put(key, list);
+                } else if (value.matches("^[-+]?\\d*\\.?\\d+$")) {
+                    if (value.contains(".")) {
+                        float floatValue = Float.parseFloat(value);
                         map.put(key, floatValue);
                     } else {
-                        int intValue = Integer.parseInt(value.toString());
+                        int intValue = Integer.parseInt(value);
                         map.put(key, intValue);
                     }
                 } else {
@@ -56,7 +52,6 @@ public class LocalStorage<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public static Object getItem(String key) {
