@@ -16,7 +16,8 @@ public class Main {
             System.out.println("2 - Ingresar varios libros");
             System.out.println("3 - Borrar un libro");
             System.out.println("4 - Obtener todas las llave valor");
-            System.out.println("5 - Elimine una llave");
+            System.out.println("5 - Eliminar una llave");
+            System.out.println("6 - Agregar una llave valor");
 
             System.out.print("Escribe tu opción: ");
             int option = scanner.nextInt();
@@ -75,6 +76,19 @@ public class Main {
                         }
                     }
                     break;
+                case 3:
+                    booksData = (LinkedList<String, String>) LocalStorage.getItem("books");
+                    scanner = new Scanner(System.in);
+                    System.out.println("Ingresa el numero del libro:");
+                    int indexOfBook = scanner.nextInt();
+                    if(booksData.get(indexOfBook - 1) != null){
+                        booksData.remove(indexOfBook - 1);
+                        LocalStorage.removeKey("books");
+                        LocalStorage.setItem("books", booksData.toArray());
+                    }else{
+                        System.out.println("No existe el libro para eliminarse");
+                    }
+                    break;
                 case 4:
                     String[] keys = LocalStorage.getAllKeys();
 
@@ -85,13 +99,20 @@ public class Main {
                 case 5:
                     scanner = new Scanner(System.in);
                     System.out.println("Ingresa el nombre de la llave:");
-                    String nameKey = scanner.nextLine();
-
-                    if(LocalStorage.keyExist(nameKey)){
-                        LocalStorage.removeKey(nameKey);
+                    String keyNameInput = scanner.nextLine();
+                    if(LocalStorage.keyExist(keyNameInput)){
+                        LocalStorage.removeKey(keyNameInput);
                     }else{
-                        System.out.println("No se ha encontrado la llave para eliminarse");
+                        System.out.println("No existe esa llave almacenada");
                     }
+                    break;
+                case 6:
+                    scanner = new Scanner(System.in);
+                    System.out.println("Ingresa el nombre de la llave:");
+                    String keyNameInputToSave = scanner.nextLine();
+                    System.out.println("Ingresa el valor de la llave:");
+                    Object valueInput = scanner.nextLine();
+                    LocalStorage.setItem(keyNameInputToSave, valueInput);
                     break;
                 default:
                     System.out.println("Opción no valida");
